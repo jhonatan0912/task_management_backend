@@ -14,39 +14,70 @@ export class TasksService {
   ) { }
 
   async create(createTaskDto: CreateTaskDto) {
-    const newTask = this.taskRepository.create(createTaskDto);
+    try {
+      const newTask = this.taskRepository.create(createTaskDto);
 
-    return await this.taskRepository.save(newTask);
+      if (!newTask) throw new Error('Error creating task');
+
+      return await this.taskRepository.save(newTask);
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   async findAll() {
-    return await this.taskRepository.find();
+    try {
+      const tasks = await this.taskRepository.find();
+
+      if (!tasks) throw new NotFoundException('No tasks found');
+
+      return tasks;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   async findOne(id: number) {
-    return await this.taskRepository.findOne({ where: { id } });
+    try {
+      const task = await this.taskRepository.findOne({ where: { id } });
+
+      if (!task) throw new NotFoundException(`Task #${id} not found`);
+
+      return task;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto) {
+    try {
+      const task = await this.taskRepository.findOne({ where: { id } });
 
-    const task = await this.taskRepository.findOne({ where: { id } });
+      if (!task) { throw new NotFoundException(`Task #${id} not found`) }
 
-    if (!task) {
-      throw new NotFoundException(`Task #${id} not found`);
+      this.taskRepository.merge(task, updateTaskDto);
+      await this.taskRepository.save(task);
+
+      return {
+        message: `Task #${id} updated`
+      };
+    } catch (error) {
+      throw new Error(error);
     }
-
-    this.taskRepository.merge(task, updateTaskDto);
-    await this.taskRepository.save(task);
-
-    return task;
   }
 
   async remove(id: number) {
+    try {
+      const { affected } = await this.taskRepository.delete({ id });
+      
+      if (affected === 0) throw new NotFoundException(`Task #${id} not found`);
 
-    const { affected } = await this.taskRepository.delete({ id });
+      return {
+        message: `Task #${id} deleted`
+      };
+    } catch (error) {
+      throw new Error(error);
+    }
 
-    if (affected === 0) throw new NotFoundException(`Task #${id} not found`);
-
-    return { message: `Task #${id} deleted` };
   }
 }
