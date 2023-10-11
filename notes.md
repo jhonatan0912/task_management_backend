@@ -1,3 +1,7 @@
+## Autoload Dtos
+
+- Add following lines to nest-cli.json
+```
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
@@ -14,3 +18,4 @@
     ]
   }
 }
+```

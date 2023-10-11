@@ -45,7 +45,7 @@ export class TasksService {
 
       return task;
     } catch (error) {
-      throw new Error(error);
+      throw new NotFoundException(error.message);
     }
   }
 
@@ -62,14 +62,14 @@ export class TasksService {
         message: `Task #${id} updated`
       };
     } catch (error) {
-      throw new Error(error);
+      throw new NotFoundException(error.message);
     }
   }
 
   async remove(id: number) {
     try {
       const { affected } = await this.taskRepository.delete({ id });
-      
+
       if (affected === 0) throw new NotFoundException(`Task #${id} not found`);
 
       return {
