@@ -15,6 +15,7 @@ export class TasksService {
 
   async create(createTaskDto: CreateTaskDto) {
     try {
+      createTaskDto.borderClass = this.generateBorderClass();
       const newTask = this.taskRepository.create(createTaskDto);
 
       if (!newTask) throw new Error('Error creating task');
@@ -53,7 +54,7 @@ export class TasksService {
     try {
       const task = await this.taskRepository.findOne({ where: { id } });
 
-      if (!task) { throw new NotFoundException(`Task #${id} not found`) }
+      if (!task) { throw new NotFoundException(`Task #${id} not found`); }
 
       this.taskRepository.merge(task, updateTaskDto);
       await this.taskRepository.save(task);
@@ -79,5 +80,10 @@ export class TasksService {
       throw new Error(error);
     }
 
+  }
+
+  generateBorderClass(): string {
+    const randomColorNumber = Math.floor(Math.random() * 24) + 1;
+    return `color-task-${randomColorNumber}`;
   }
 }

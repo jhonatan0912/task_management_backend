@@ -12,6 +12,9 @@ export class Task {
   @Column()
   description: string;
 
+  @Column()
+  borderClass: string;
+
   @Column({ default: false })
   completed: boolean;
 
