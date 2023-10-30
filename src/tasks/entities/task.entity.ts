@@ -3,19 +3,27 @@ import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 @Entity('tasks')
 export class Task {
 
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Column()
+  @Column({
+    type: 'varchar',
+  })
   title: string;
 
-  @Column()
+  @Column({
+    type: 'varchar',
+  })
   description: string;
 
-  @Column()
+  @Column({
+    type: 'varchar',
+  })
   borderClass: string;
 
-  @Column({ default: false })
+  @Column({
+    type: 'boolean',
+    default: false
+  })
   completed: boolean;
-
 }

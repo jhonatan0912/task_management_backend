@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Task } from './entities/task.entity';
 import { Repository } from 'typeorm';
+import { Task } from './entities/task.entity';
+import { CreateTaskDto, UpdateTaskDto } from './dto';
 
 @Injectable()
 export class TasksService {
@@ -14,8 +13,10 @@ export class TasksService {
   ) { }
 
   async create(createTaskDto: CreateTaskDto) {
+
+    createTaskDto.borderClass = this.generateBorderClass();
+
     try {
-      createTaskDto.borderClass = this.generateBorderClass();
       const newTask = this.taskRepository.create(createTaskDto);
 
       if (!newTask) throw new Error('Error creating task');
@@ -28,7 +29,7 @@ export class TasksService {
 
   async findAll() {
     try {
-      const tasks = await this.taskRepository.find();
+      const tasks = await this.taskRepository.find({ cache: true });
 
       if (!tasks) throw new NotFoundException('No tasks found');
 
@@ -38,7 +39,7 @@ export class TasksService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     try {
       const task = await this.taskRepository.findOne({ where: { id } });
 
@@ -50,7 +51,7 @@ export class TasksService {
     }
   }
 
-  async update(id: number, updateTaskDto: UpdateTaskDto) {
+  async update(id: string, updateTaskDto: UpdateTaskDto) {
     try {
       const task = await this.taskRepository.findOne({ where: { id } });
 
@@ -67,7 +68,7 @@ export class TasksService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     try {
       const { affected } = await this.taskRepository.delete({ id });
 
