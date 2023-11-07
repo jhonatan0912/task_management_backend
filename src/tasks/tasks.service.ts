@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Task } from './entities/task.entity';
@@ -15,27 +15,22 @@ export class TasksService {
   async create(createTaskDto: CreateTaskDto) {
 
     createTaskDto.borderClass = this.generateBorderClass();
-
     try {
-      const newTask = this.taskRepository.create(createTaskDto);
-
-      if (!newTask) throw new Error('Error creating task');
-
-      return await this.taskRepository.save(newTask);
+      return await this.taskRepository.save(createTaskDto);
     } catch (error) {
-      throw new Error(error);
+      throw new BadRequestException('Error saving task');
     }
   }
 
   async findAll() {
+
     try {
       const tasks = await this.taskRepository.find({ cache: true });
-
       if (!tasks) throw new NotFoundException('No tasks found');
 
       return tasks;
     } catch (error) {
-      throw new Error(error);
+      throw new NotFoundException('No tasks found');
     }
   }
 
@@ -78,7 +73,7 @@ export class TasksService {
         message: `Task #${id} deleted`
       };
     } catch (error) {
-      throw new Error(error);
+      throw new NotFoundException(error.message);
     }
 
   }
